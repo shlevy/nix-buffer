@@ -1,17 +1,17 @@
-;;; nix-buffer.el --- Command for setting up buffer environments with
-;;; nix
+;;; nix-buffer.el --- Set up buffer environments with nix
 
 ;; Coypright (C) 2016 Shea Levy
 
 ;; Author: Shea Levy
 ;; URL: https://github.com/shlevy/nix-buffer/tree/master/
-;; Version: 1.0
+;; Version: 1.1
 ;; Package-Requires: ((f "0.17.3") (emacs "24.4"))
 
 ;;; Commentary:
 
-;; This package provides 'nix-buffer-enter', to modify your buffer
-;; according to a directory-local nix expression.
+;; This package provides 'nix-buffer', to modify your buffer
+;; according to a directory-local nix expression. Think of it as
+;; nix-shell for emacs.
 
 ;; It may be desirable to run this before 'normal-mode' is called so
 ;; it affects all modes.
@@ -97,7 +97,7 @@ LISP-FILE The file in question."
     res))
 
 ;;;###autoload
-(defun nix-buffer-enter ()
+(defun nix-buffer ()
   "Set up the buffer according to the directory-local nix expression.
 Looks for dir-locals.nix upward from the current directory.  If found,
 builds the derivation defined there with the 'root' arg set to the
