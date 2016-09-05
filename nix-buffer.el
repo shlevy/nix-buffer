@@ -21,6 +21,21 @@
 (require 'f)
 (require 'subr-x)
 
+; See https://github.com/rejeep/f.el/issues/67
+(defun f-traverse-upwards (fn &optional path)
+  "Traverse up as long as FN returns nil, starting at PATH.
+If FN returns a non-nil value, the path sent as argument to FN is
+returned. If no function callback return a non-nil value, nil is
+returned."
+  (unless path
+    (setq path default-directory))
+  (when (f-relative? path)
+    (setq path (f-expand path)))
+  (if (funcall fn path)
+      path
+    (unless (f-root? path)
+      (f-traverse-upwards fn (f-parent path)))))
+
 (defconst nix-buffer--directory-name
   (locate-user-emacs-file "nix-buffer"))
 
