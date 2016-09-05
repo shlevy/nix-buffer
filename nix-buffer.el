@@ -4,7 +4,7 @@
 
 ;; Author: Shea Levy
 ;; URL: https://github.com/shlevy/nix-buffer/tree/master/
-;; Version: 1.1
+;; Version: 1.2
 ;; Package-Requires: ((f "0.17.3") (emacs "24.4"))
 
 ;;; Commentary:
@@ -67,7 +67,7 @@ EXPR-FILE The file containing the nix expression to build."
       (let* ((stderr-file (make-temp-file "err"))
 	     (res (call-process "nix-build"
 				nil
-				'(t stderr-file)
+				(list t stderr-file)
 				nil
 				"--arg"
 				"root"
