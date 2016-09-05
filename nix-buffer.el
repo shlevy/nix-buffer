@@ -1,5 +1,4 @@
-;;; nix-buffer.el --- Command for setting up buffer environments with
-;;; nix
+;;; nix-buffer.el --- Command for setting up buffer environments with nix
 
 ;; Coypright (C) 2016 Shea Levy
 
