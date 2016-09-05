@@ -4,7 +4,7 @@
 
 ;; Author: Shea Levy
 ;; URL: https://github.com/shlevy/nix-buffer/tree/master/
-;; Version: 1.2
+;; Version: 1.2.1
 ;; Package-Requires: ((f "0.17.3") (emacs "24.4"))
 
 ;;; Commentary:
@@ -13,8 +13,8 @@
 ;; according to a directory-local nix expression. Think of it as
 ;; nix-shell for emacs.
 
-;; It may be desirable to run this before 'normal-mode' is called so
-;; it affects all modes.
+;; It may be desirable to add this to 'find-file-hook' for non-remote
+;; files.
 
 ;;; Code:
 
