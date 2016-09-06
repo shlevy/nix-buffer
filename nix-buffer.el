@@ -4,7 +4,7 @@
 
 ;; Author: Shea Levy
 ;; URL: https://github.com/shlevy/nix-buffer/tree/master/
-;; Version: 1.2.1
+;; Version: 1.2.2
 ;; Package-Requires: ((f "0.17.3") (emacs "24.4"))
 
 ;;; Commentary:
@@ -22,7 +22,7 @@
 (require 'subr-x)
 
 ; See https://github.com/rejeep/f.el/issues/67
-(defun f-traverse-upwards (fn &optional path)
+(defun nix-buffer--f-traverse-upwards (fn &optional path)
   "Traverse up as long as FN returns nil, starting at PATH.
 If FN returns a non-nil value, the path sent as argument to FN is
 returned. If no function callback return a non-nil value, nil is
@@ -34,7 +34,7 @@ returned."
   (if (funcall fn path)
       path
     (unless (f-root? path)
-      (f-traverse-upwards fn (f-parent path)))))
+      (nix-buffer--f-traverse-upwards fn (f-parent path)))))
 
 (defconst nix-buffer--directory-name
   (locate-user-emacs-file "nix-buffer"))
@@ -131,7 +131,7 @@ modifying buffer-local variables, but there is no actual enforcement
 of this.  'setq-local' is your friend."
   (interactive)
   (let* ((root (or (buffer-file-name) default-directory))
-	 (expr-dir (f-traverse-upwards
+	 (expr-dir (nix-buffer--f-traverse-upwards
 		     (lambda (path)
 		       (f-exists? (f-expand
 				   "dir-locals.nix"
