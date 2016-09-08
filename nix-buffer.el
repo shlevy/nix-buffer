@@ -1,20 +1,20 @@
 ;;; nix-buffer.el --- Set up buffer environments with nix
 
-;; Coypright (C) 2016 Shea Levy
+;; Copyright (C) 2016 Shea Levy
 
 ;; Author: Shea Levy
 ;; URL: https://github.com/shlevy/nix-buffer/tree/master/
-;; Version: 1.2.2
+;; Version: 1.2.3
 ;; Package-Requires: ((f "0.17.3") (emacs "24.4"))
 
 ;;; Commentary:
 
 ;; This package provides 'nix-buffer', to modify your buffer
-;; according to a directory-local nix expression. Think of it as
-;; nix-shell for emacs.
+;; according to a directory-local nix expression.  Think of it as
+;; nix-shell for Emacs.
 
-;; It may be desirable to add this to 'find-file-hook' for non-remote
-;; files.
+;; It may be desirable to run this before 'normal-mode' is called so
+;; it affects all modes.
 
 ;;; Code:
 
@@ -107,7 +107,7 @@ LISP-FILE The file in question."
   (let ((res (yes-or-no-p (concat expr-file
 				  " resulted in unknown Lisp file "
 				  lisp-file
-				  "; trust it?"))))
+				  "; trust it? "))))
     (puthash lisp-file res nix-buffer--trusted-exprs)
     res))
 
