@@ -1,10 +1,10 @@
 ;;; nix-buffer.el --- Set up buffer environments with nix
 
-;; Copyright (C) 2016 Shea Levy
+;; Copyright (C) 2016, 2017 Shea Levy
 
 ;; Author: Shea Levy
 ;; URL: https://github.com/shlevy/nix-buffer/tree/master/
-;; Version: 1.2.3
+;; Version: 1.3.0
 ;; Package-Requires: ((f "0.17.3") (emacs "24.4"))
 
 ;;; Commentary:
@@ -20,21 +20,6 @@
 
 (require 'f)
 (require 'subr-x)
-
-; See https://github.com/rejeep/f.el/issues/67
-(defun nix-buffer--f-traverse-upwards (fn &optional path)
-  "Traverse up as long as FN returns nil, starting at PATH.
-If FN returns a non-nil value, the path sent as argument to FN is
-returned. If no function callback return a non-nil value, nil is
-returned."
-  (unless path
-    (setq path default-directory))
-  (when (f-relative? path)
-    (setq path (f-expand path)))
-  (if (funcall fn path)
-      path
-    (unless (f-root? path)
-      (nix-buffer--f-traverse-upwards fn (f-parent path)))))
 
 (defconst nix-buffer--directory-name
   (locate-user-emacs-file "nix-buffer"))
@@ -131,12 +116,7 @@ modifying buffer-local variables, but there is no actual enforcement
 of this.  'setq-local' is your friend."
   (interactive)
   (let* ((root (or (buffer-file-name) default-directory))
-	 (expr-dir (nix-buffer--f-traverse-upwards
-		     (lambda (path)
-		       (f-exists? (f-expand
-				   "dir-locals.nix"
-				   path)))
-		     root)))
+	 (expr-dir (locate-dominating-file root "dir-locals.nix")))
     (and expr-dir
 	 (let* ((expr-file (f-expand "dir-locals.nix" expr-dir))
 		(result (nix-buffer--nix-build root expr-file)))
