@@ -4,7 +4,7 @@
 
 ;; Author: Shea Levy
 ;; URL: https://github.com/shlevy/nix-buffer/tree/master/
-;; Version: 2.2.0
+;; Version: 2.3.0
 ;; Package-Requires: ((f "0.17.3") (emacs "24.4"))
 
 ;;; Commentary:
@@ -22,11 +22,19 @@
 (require 'f)
 (require 'subr-x)
 
-(defconst nix-buffer--directory-name
-  (locate-user-emacs-file "nix-buffer"))
+(defgroup nix-buffer nil "Customization for nix-buffer."
+  :prefix "nix-buffer-"
+  :package-version '('nix-buffer . "2.3.0"))
+
+(defcustom nix-buffer-directory-name
+  (locate-user-emacs-file "nix-buffer")
+  "Path where nix-buffer keeps its data."
+  :group 'nix-buffer
+  :type '(directory)
+  :risky t)
 
 (defconst nix-buffer--trust-exprs-file
-  (f-join nix-buffer--directory-name "trusted-exprs"))
+  (f-join nix-buffer-directory-name "trusted-exprs"))
 
 (defvar nix-buffer--trusted-exprs
   (let ((tbl (ignore-errors
@@ -40,7 +48,7 @@
 
 (defun nix-buffer-unload-function ()
   "Save state on unload."
-  (ignore-errors (make-directory nix-buffer--directory-name t))
+  (ignore-errors (make-directory nix-buffer-directory-name t))
   (with-temp-buffer
     (prin1 nix-buffer--trusted-exprs (current-buffer))
     (write-region nil nil nix-buffer--trust-exprs-file))
@@ -125,7 +133,7 @@ EVENT The process status change event string."
 ROOT The path we started from.
 
 EXPR-FILE The file containing the nix expression to build."
-  (let* ((state-dir (f-join nix-buffer--directory-name
+  (let* ((state-dir (f-join nix-buffer-directory-name
 			    (nix-buffer--unique-filename root)))
 	 (out-link (f-join state-dir "result"))
 	 (current-out (file-symlink-p out-link))
