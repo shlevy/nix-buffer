@@ -4,7 +4,7 @@
 
 ;; Author: Shea Levy
 ;; URL: https://github.com/shlevy/nix-buffer/tree/master/
-;; Version: 3.0.0
+;; Version: 3.0.1
 ;; Package-Requires: ((f "0.17.3") (emacs "24.4"))
 
 ;;; Commentary:
@@ -214,7 +214,7 @@ If dir-locals.nix does not evaluate to any derivations (e.g. it
 evaluates to {}), then nothing is loaded and the cached result, if any,
 is removed."
   (interactive)
-  (let* ((root (or (buffer-file-name) default-directory))
+  (let* ((root (directory-file-name (or (buffer-file-name) default-directory)))
 	 (expr-dir (locate-dominating-file root "dir-locals.nix")))
     (when expr-dir
 	 (let ((expr-file (f-expand "dir-locals.nix" expr-dir)))
