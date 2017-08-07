@@ -183,6 +183,11 @@ EXPR-FILE The file containing the nix expression to build."
       (when current-out
 	(nix-buffer--load-result expr-file current-out)))))
 
+(defcustom nix-buffer-root-file "dir-locals.nix"
+  "File name to use for determining Nix derivation to use in nix-buffer."
+  :group 'nix-buffer
+  :type '(string))
+
 ;;;###autoload
 (defun nix-buffer ()
   "Set up the buffer according to the directory-local nix expression.
@@ -215,11 +220,11 @@ evaluates to {}), then nothing is loaded and the cached result, if any,
 is removed."
   (interactive)
   (let* ((root (directory-file-name (or (buffer-file-name) default-directory)))
-	 (expr-dir (locate-dominating-file root "dir-locals.nix")))
+	 (expr-dir (locate-dominating-file root nix-buffer-root-file)))
     (if expr-dir
-	(let ((expr-file (f-expand "dir-locals.nix" expr-dir)))
+	(let ((expr-file (f-expand nix-buffer-root-file expr-dir)))
 	  (nix-buffer--nix-build root expr-file))
-      (error "No dir-locals.nix file found"))))
+      (error "No %s file found" nix-buffer-root-file))))
 
 (add-hook 'kill-emacs-hook 'nix-buffer-unload-function)
 
