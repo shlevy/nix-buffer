@@ -161,27 +161,26 @@ EXPR-FILE The file containing the nix expression to build."
 	 (out-link (f-join state-dir "result"))
 	 (current-out (file-symlink-p out-link))
 	 (err (generate-new-buffer " nix-buffer-nix-build-stderr")))
-    (progn
-      (ignore-errors (make-directory state-dir t))
-      (make-process
-       :name "nix-buffer-nix-build"
-       :buffer (generate-new-buffer " nix-buffer-nix-build-stdout")
-       :command (list
-		 "nix-build"
-		 "--arg" "root" root
-		 "--out-link" out-link
-		 expr-file
-		 )
-       :noquery t
-       :sentinel (apply-partially 'nix-buffer--sentinel
-				  out-link
-				  current-out
-				  expr-file
-				  (current-buffer)
-				  err)
-       :stderr err)
-      (when current-out
-	(nix-buffer--load-result expr-file current-out)))))
+    (ignore-errors (make-directory state-dir t))
+    (make-process
+     :name "nix-buffer-nix-build"
+     :buffer (generate-new-buffer " nix-buffer-nix-build-stdout")
+     :command (list
+	       "nix-build"
+	       "--arg" "root" root
+	       "--out-link" out-link
+	       expr-file
+	       )
+     :noquery t
+     :sentinel (apply-partially 'nix-buffer--sentinel
+				out-link
+				current-out
+				expr-file
+				(current-buffer)
+				err)
+     :stderr err)
+    (when current-out
+      (nix-buffer--load-result expr-file current-out))))
 
 (defcustom nix-buffer-root-file "dir-locals.nix"
   "File name to use for determining Nix expression to use."
