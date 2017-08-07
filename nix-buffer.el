@@ -216,9 +216,10 @@ is removed."
   (interactive)
   (let* ((root (directory-file-name (or (buffer-file-name) default-directory)))
 	 (expr-dir (locate-dominating-file root "dir-locals.nix")))
-    (when expr-dir
-	 (let ((expr-file (f-expand "dir-locals.nix" expr-dir)))
-	   (nix-buffer--nix-build root expr-file)))))
+    (if expr-dir
+	(let ((expr-file (f-expand "dir-locals.nix" expr-dir)))
+	  (nix-buffer--nix-build root expr-file))
+      (error "No dir-locals.nix file found"))))
 
 (add-hook 'kill-emacs-hook 'nix-buffer-unload-function)
 
