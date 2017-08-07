@@ -184,7 +184,7 @@ EXPR-FILE The file containing the nix expression to build."
 	(nix-buffer--load-result expr-file current-out)))))
 
 (defcustom nix-buffer-root-file "dir-locals.nix"
-  "File name to use for determining Nix derivation to use in nix-buffer."
+  "File name to use for determining Nix expression to use."
   :group 'nix-buffer
   :type '(string))
 
