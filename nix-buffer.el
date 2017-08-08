@@ -224,6 +224,27 @@ is removed."
       (let ((expr-file (f-expand nix-buffer-root-file expr-dir)))
 	(nix-buffer--nix-build root expr-file)))))
 
+;;;###autoload
+(defun nix-buffer-projectile ()
+  "A convenient function to add to projectile-mode-hook.
+
+Enables nix-buffer whenever it finds you are in a Nix
+project (containing a default.nix file)
+
+Add as a hook to projectile with this code:
+
+(require 'projectile)
+(projectile-register-project-type 'nix '(\"default.nix\") \"nix-build\")
+(add-hook 'projectile-mode-hook 'nix-buffer-projectile))"
+ (when (and (not (file-remote-p default-directory))
+             (projectile-project-p)
+             (eq (projectile-project-type) 'nix)
+             (file-exists-p
+               (expand-file-name "default.nix" (projectile-project-root))))
+    (nix-buffer--nix-build (substring (projectile-project-root) 0 -1)
+      (expand-file-name "nix-buffer.nix"
+        (file-name-directory (locate-library "nix-buffer"))))))
+
 (add-hook 'kill-emacs-hook 'nix-buffer-unload-function)
 
 (provide 'nix-buffer)
