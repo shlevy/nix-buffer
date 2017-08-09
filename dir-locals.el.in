@@ -11,7 +11,7 @@
 (setq-local process-environment (copy-tree process-environment))
 
 (dolist (x nix-buffer-env)
-  (unless (memq (car x) '(HOME TMP TMPDIR TEMP PATH))
+  (unless (memq (car x) '(HOME TMP TMPDIR TEMP PATH SSL_CERT_FILE PWD))
     (setenv (symbol-name (car x)) (cdr x))))
 
 ;; don’t override parent PATH
