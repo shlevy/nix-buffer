@@ -225,6 +225,15 @@ is removed."
       (let ((expr-file (f-expand nix-buffer-root-file expr-dir)))
 	(nix-buffer--nix-build root expr-file)))))
 
+(defun nix-buffer-with-root (root)
+  "Load nix-buffer in ROOT."
+  (let* ((dir-locals (expand-file-name nix-buffer-root-file root))
+         (defnix (if (file-exists-p dir-locals) dir-locals
+                   (expand-file-name "nix-buffer.nix"
+                                     (file-name-directory
+                                      (locate-library "nix-buffer"))))))
+    (nix-buffer--nix-build root defnix)))
+
 ;;;###autoload
 (defun nix-buffer-projectile ()
   "A convenient function to add to ‘find-file-hook’.
@@ -237,18 +246,17 @@ project (containing a default.nix file). Install by adding
              projectile-mode
              (projectile-project-p)
              (eq (projectile-project-type) 'nix))
-    (let* ((root (projectile-project-root))
-           (dir-locals (expand-file-name "dir-locals.nix" root))
-           (defnix (if (file-exists-p dir-locals) dir-locals
-                     (expand-file-name "nix-buffer.nix"
-                                       (file-name-directory
-                                        (locate-library "nix-buffer"))))))
-      (nix-buffer--nix-build root defnix))))
+    (nix-buffer-with-root (projectile-project-root))))
+
+;;;###autoload
+(defun nix-buffer-dir-locals ()
+  "A hook for nix-buffer usable in dir-locals.el."
+  (nix-buffer-with-root (file-name-directory
+                         (let ((d (dir-locals-find-file ".")))
+                           (if (stringp d) d (car d))))))
 
 (projectile-register-project-type 'nix '("default.nix")
                                   :compile "nix-build")
-
-(add-hook 'change-major-mode-hook 'nix-buffer-projectile)
 
 (add-hook 'kill-emacs-hook 'nix-buffer-unload-function)
 
