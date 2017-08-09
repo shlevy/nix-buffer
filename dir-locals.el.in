@@ -3,10 +3,9 @@
 
 ;; TODO: move common stuff to function in nix-buffer.el
 
-(put 'process-environment 'permanent-local t)
-
 ;; setenv modifies in place, so copy the environment first
-(setq process-environment (copy-tree process-environment))
+(put 'process-environment 'permanent-local t)
+(setq-local process-environment (copy-tree process-environment))
 
 (defun setenvs (env)
   "Set environment variables from ENV alist."
@@ -17,7 +16,8 @@
 
 (setenvs (json-read-file "@env@"))
 
-(setq exec-path (append (split-string (getenv "PATH") ":") exec-path))
+(put 'exec-path 'permanent-local t)
+(setq-local exec-path (append (split-string (getenv "PATH") ":") exec-path))
 
 ;; Local Variables:
 ;; flycheck-disabled-checkers: (emacs-lisp-checkdoc)

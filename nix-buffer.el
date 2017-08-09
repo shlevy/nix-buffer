@@ -247,7 +247,10 @@ project (containing a default.nix file). Install by adding
 (projectile-register-project-type 'nix '("default.nix")
                                   :compile "nix-build")
 
-(add-hook 'after-change-major-mode-hook 'nix-buffer-projectile)
+;; (add-hook 'after-change-major-mode-hook 'nix-buffer-projectile)
+(add-hook 'find-file-hook 'nix-buffer-projectile)
+(add-hook 'eshell-mode-hook 'nix-buffer-projectile)
+(add-hook 'dired-mode-hook 'nix-buffer-projectile)
 
 (add-hook 'kill-emacs-hook 'nix-buffer-unload-function)
 
