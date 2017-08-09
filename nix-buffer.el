@@ -232,7 +232,8 @@ is removed."
 Enables nix-buffer whenever it finds you are in a Nix
 project (containing a default.nix file). Install by adding
 ‘nix-projectile-buffer’ to ‘find-file-hook’."
-  (when (and (not (file-remote-p default-directory))
+  (when (and (not (or noninteractive (eq (aref (buffer-name) 0) ?\s)))
+             (not (file-remote-p default-directory))
              projectile-mode
              (projectile-project-p)
              (eq (projectile-project-type) 'nix))
@@ -247,10 +248,7 @@ project (containing a default.nix file). Install by adding
 (projectile-register-project-type 'nix '("default.nix")
                                   :compile "nix-build")
 
-;; (add-hook 'after-change-major-mode-hook 'nix-buffer-projectile)
-(add-hook 'find-file-hook 'nix-buffer-projectile)
-(add-hook 'eshell-mode-hook 'nix-buffer-projectile)
-(add-hook 'dired-mode-hook 'nix-buffer-projectile)
+(add-hook 'change-major-mode-hook 'nix-buffer-projectile)
 
 (add-hook 'kill-emacs-hook 'nix-buffer-unload-function)
 
