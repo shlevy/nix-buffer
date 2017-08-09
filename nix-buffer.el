@@ -233,6 +233,7 @@ Enables nix-buffer whenever it finds you are in a Nix
 project (containing a default.nix file). Install by adding
 ‘nix-projectile-buffer’ to ‘find-file-hook’."
   (when (and (not (file-remote-p default-directory))
+             projectile-mode
              (projectile-project-p)
              (eq (projectile-project-type) 'nix))
     (let* ((root (projectile-project-root))
