@@ -236,12 +236,21 @@ is removed."
 
 ;;;###autoload
 (defun nix-buffer-projectile ()
-  "A convenient function to add to ‘find-file-hook’.
+  "Projectile integration with nix-buffer.
+
+Provides a convenient function to add to
+‘after-change-major-mode-hook’ when you have projectile enabled.
 
 Enables nix-buffer whenever it finds you are in a Nix
-project (containing a default.nix file). Install by adding
-‘nix-projectile-buffer’ to ‘find-file-hook’."
-  (when (and (not (or noninteractive (eq (aref (buffer-name) 0) ?\s)))
+project (i.e. has a default.nix file). Install by adding
+‘nix-buffer-projectile’ to ‘after-change-major-mode-hook’.
+
+For example:
+
+\(add-hook 'after-change-major-mode-hook
+'nix-buffer-projectile\)"
+  (when (and (not noninteractive)
+             (not (eq (aref (buffer-name) 0) ?\s))
              (not (file-remote-p default-directory))
              projectile-mode
              (projectile-project-p)
@@ -250,7 +259,17 @@ project (containing a default.nix file). Install by adding
 
 ;;;###autoload
 (defun nix-buffer-dir-locals ()
-  "A hook for nix-buffer usable in dir-locals.el."
+  "A hook for nix-buffer usable in dir-locals.el.
+
+For example in the root of your project directory, place this in
+a new file named .dir-locals.el:
+
+\((nil . ((eval . (nix-buffer-dir-locals))))\)
+
+Note that this will only apply to files. To work with non files
+like ‘eshell’ you must add ‘nix-buffer-dir-locals’ as a hook:
+
+\(add-hook 'eshell-mode-hook 'nix-buffer-dir-locals\)"
   (nix-buffer-with-root (file-name-directory
                          (let ((d (dir-locals-find-file ".")))
                            (if (stringp d) d (car d))))))
