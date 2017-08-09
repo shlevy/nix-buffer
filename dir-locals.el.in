@@ -1,5 +1,6 @@
 (require 'json)
 (require 'subr-x)
+(require 'esh-util)
 
 ;; TODO: move common stuff to function in nix-buffer.el
 
@@ -18,6 +19,9 @@
 
 (put 'exec-path 'permanent-local t)
 (setq-local exec-path (append (split-string (getenv "PATH") ":") exec-path))
+
+(put 'eshell-path-env 'permanent-local t)
+(setq-local eshell-path-env (getenv "PATH"))
 
 ;; Local Variables:
 ;; flycheck-disabled-checkers: (emacs-lisp-checkdoc)
