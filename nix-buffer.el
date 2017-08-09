@@ -220,10 +220,9 @@ is removed."
   (interactive)
   (let* ((root (directory-file-name (or (buffer-file-name) default-directory)))
 	 (expr-dir (locate-dominating-file root nix-buffer-root-file)))
-    (if expr-dir
-	(let ((expr-file (f-expand nix-buffer-root-file expr-dir)))
-	  (nix-buffer--nix-build root expr-file))
-      (error "No %s file found" nix-buffer-root-file))))
+    (when expr-dir
+      (let ((expr-file (f-expand nix-buffer-root-file expr-dir)))
+	(nix-buffer--nix-build root expr-file)))))
 
 (add-hook 'kill-emacs-hook 'nix-buffer-unload-function)
 
