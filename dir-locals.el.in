@@ -4,20 +4,21 @@
 
 ;; TODO: move common stuff to function in nix-buffer.el
 
+(defvar-local nix-buffer-env (json-read-file "@env@"))
+
 ;; setenv modifies in place, so copy the environment first
 (put 'process-environment 'permanent-local t)
 (setq-local process-environment (copy-tree process-environment))
 
-(defun setenvs (env)
-  "Set environment variables from ENV alist."
-  (dolist (x env)
-    (unless (memq (car x) '(HOME TMP TMPDIR TEMP PATH))
-      (setenv (symbol-name (car x)) (cdr x)))))
+(dolist (x nix-buffer-env)
+  (unless (memq (car x) '(HOME TMP TMPDIR TEMP PATH))
+    (setenv (symbol-name (car x)) (cdr x))))
 
-(setenvs (json-read-file "@env@"))
+;; don’t override parent PATH
+(setenv "PATH" (concat (alist-get 'PATH nix-buffer-env) ":" (getenv "PATH")))
 
 (put 'exec-path 'permanent-local t)
-(setq-local exec-path (append (split-string (getenv "PATH") ":") exec-path))
+(setq-local exec-path (split-string (getenv "PATH") ":"))
 
 (put 'eshell-path-env 'permanent-local t)
 (setq-local eshell-path-env (getenv "PATH"))
