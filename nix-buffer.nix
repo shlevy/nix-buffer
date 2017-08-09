@@ -17,6 +17,6 @@ let
     cp ${./dir-locals.el.in} $out
     substituteAllInPlace $out
   '';
-in if builtins.pathExists defnix then
+in if builtins.pathExists defnix && isDerivation drv then
   withPackage drv
 else {}
