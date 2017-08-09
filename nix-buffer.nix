@@ -1,12 +1,16 @@
 { root }:
 let
-  defnix = root + "/default.nix";
   pkgs = import <nixpkgs> {};
   inherit (pkgs) writeText runCommand;
   inherit (pkgs.lib) overrideDerivation isDerivation;
   inherit (pkgs.emacsPackagesNg) inherit-local;
   inherit (pkgs.nixBufferBuilders) withPackages;
-  drv = import (builtins.toPath defnix) {};
+
+  defnix = builtins.toPath (root + "/default.nix");
+  drv' = import defnix;
+  drv = if (builtins.isFunction (import defnix)) then import defnix {}
+        else import defnix;
+
   packageEnv = pkg: overrideDerivation pkg (old: {
     phases = [ "installPhase" ];
     # TODO: run configurePhase and shellHook here
