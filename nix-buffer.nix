@@ -15,6 +15,7 @@ let
     phases = [ "installPhase" ];
     # TODO: run configurePhase and shellHook here
     installPhase = "${pkgs.jq}/bin/jq -n env > $out";
+    src = "true";
   });
   withPackage = pkg: runCommand "dir-locals.el" {
     env = packageEnv pkg;
