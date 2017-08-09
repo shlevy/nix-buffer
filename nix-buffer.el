@@ -255,9 +255,6 @@ project (containing a default.nix file). Install by adding
                          (let ((d (dir-locals-find-file ".")))
                            (if (stringp d) d (car d))))))
 
-(projectile-register-project-type 'nix '("default.nix")
-                                  :compile "nix-build")
-
 (add-hook 'kill-emacs-hook 'nix-buffer-unload-function)
 
 (provide 'nix-buffer)
