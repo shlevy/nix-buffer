@@ -13,7 +13,6 @@ let
   });
   withPackage = pkg: runCommand "dir-locals.el" {
     env = packageEnv pkg;
-    inheritlocal = "${inherit-local}/share/emacs/site-lisp/elpa/inherit-local-${inherit-local.version}/inherit-local.elc";
   } ''
     cp ${./dir-locals.el.in} $out
     substituteAllInPlace $out
