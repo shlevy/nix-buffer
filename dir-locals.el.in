@@ -1,0 +1,28 @@
+(require 'inherit-local "@inheritlocal@")
+
+(require 'json)
+(require 'subr-x)
+
+;; TODO: move common stuff to function in nix-buffer.el
+
+(put 'process-environment 'permanent-local t)
+(inherit-local 'process-environment)
+
+;; setenv modifies in place, so copy the environment first
+(setq process-environment (copy-tree process-environment))
+
+(defun setenvs (env)
+  "Set environment variables from ENV alist."
+  (dolist (x env)
+    (message "%s" (symbol-name (car x)))
+    (unless (memq (car x) '(HOME TMP TMPDIR TEMP))
+      (setenv (symbol-name (car x)) (cdr x)))))
+
+(setenvs (json-read-file "@env@"))
+
+(inherit-local-permanent exec-path
+                         (append (split-string (getenv "PATH") ":") exec-path))
+
+;; Local Variables:
+;; flycheck-disabled-checkers: (emacs-lisp-checkdoc)
+;; End:

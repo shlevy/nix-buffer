@@ -227,11 +227,11 @@ is removed."
 
 ;;;###autoload
 (defun nix-buffer-projectile ()
-  "A convenient function to add to projectile-mode-hook.
+  "A convenient function to add to ‘find-file-hook’.
 
 Enables nix-buffer whenever it finds you are in a Nix
 project (containing a default.nix file). Install by adding
-‘nix-projectile-buffer’ to ‘projectile-mode-hook’."
+‘nix-projectile-buffer’ to ‘find-file-hook’."
   (when (and (not (file-remote-p default-directory))
              (projectile-project-p)
              (eq (projectile-project-type) 'nix))
@@ -245,6 +245,8 @@ project (containing a default.nix file). Install by adding
 
 (projectile-register-project-type 'nix '("default.nix")
                                   :compile "nix-build")
+
+(add-hook 'find-file-hook 'nix-buffer-projectile)
 
 (add-hook 'kill-emacs-hook 'nix-buffer-unload-function)
 
