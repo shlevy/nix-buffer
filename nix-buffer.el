@@ -21,6 +21,7 @@
 
 (require 'f)
 (require 'subr-x)
+(require 'projectile)
 
 (defgroup nix-buffer nil "Customization for nix-buffer."
   :prefix "nix-buffer-"
@@ -229,21 +230,21 @@ is removed."
   "A convenient function to add to projectile-mode-hook.
 
 Enables nix-buffer whenever it finds you are in a Nix
-project (containing a default.nix file)
-
-Add as a hook to projectile with this code:
-
-(require 'projectile)
-(projectile-register-project-type 'nix '(\"default.nix\") \"nix-build\")
-(add-hook 'projectile-mode-hook 'nix-buffer-projectile))"
- (when (and (not (file-remote-p default-directory))
+project (containing a default.nix file). Install by adding
+‘nix-projectile-buffer’ to ‘projectile-mode-hook’."
+  (when (and (not (file-remote-p default-directory))
              (projectile-project-p)
-             (eq (projectile-project-type) 'nix)
-             (file-exists-p
-               (expand-file-name "default.nix" (projectile-project-root))))
-    (nix-buffer--nix-build (substring (projectile-project-root) 0 -1)
-      (expand-file-name "nix-buffer.nix"
-        (file-name-directory (locate-library "nix-buffer"))))))
+             (eq (projectile-project-type) 'nix))
+    (let* ((root (projectile-project-root))
+           (dir-locals (expand-file-name "dir-locals.nix" root))
+           (defnix (if (file-exists-p dir-locals) dir-locals
+                     (expand-file-name "nix-buffer.nix"
+                                       (file-name-directory
+                                        (locate-library "nix-buffer"))))))
+      (nix-buffer--nix-build root defnix))))
+
+(projectile-register-project-type 'nix '("default.nix")
+                                  :compile "nix-build")
 
 (add-hook 'kill-emacs-hook 'nix-buffer-unload-function)
 

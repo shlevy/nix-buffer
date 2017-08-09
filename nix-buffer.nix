@@ -5,6 +5,7 @@ let
   inherit (pkgs) lib writeText runCommand;
   inherit (pkgs.emacsPackagesNg) inherit-local;
   inherit (pkgs.nixBufferBuilders) withPackages;
-in if builtins.pathExists defnix then
-  withPackages (import defnix).buildInputs
+  drv = (import (builtins.toPath defnix) {});
+in if builtins.pathExists defnix && builtins.hasAttr "buildInputs" drv then
+  withPackages drv.buildInputs
 else {}
