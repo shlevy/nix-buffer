@@ -11,8 +11,7 @@
 (defun setenvs (env)
   "Set environment variables from ENV alist."
   (dolist (x env)
-    (message "%s" (symbol-name (car x)))
-    (unless (memq (car x) '(HOME TMP TMPDIR TEMP))
+    (unless (memq (car x) '(HOME TMP TMPDIR TEMP PATH))
       (setenv (symbol-name (car x)) (cdr x)))))
 
 (setenvs (json-read-file "@env@"))
