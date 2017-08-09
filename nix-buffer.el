@@ -4,7 +4,7 @@
 
 ;; Author: Shea Levy
 ;; URL: https://github.com/shlevy/nix-buffer/tree/master/
-;; Version: 3.0.1
+;; Version: 3.1.0
 ;; Package-Requires: ((f "0.17.3") (emacs "24.4"))
 
 ;;; Commentary:
@@ -25,7 +25,7 @@
 (defgroup nix-buffer nil "Customization for nix-buffer."
   :prefix "nix-buffer-"
   :group 'environment
-  :package-version '('nix-buffer . "2.3.0"))
+  :package-version '('nix-buffer . "3.1.0"))
 
 (defun nix-buffer--directory-name-setter (opt val)
   "Defcustom setter for nix-buffer-directory-name.
