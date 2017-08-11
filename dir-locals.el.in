@@ -1,13 +1,23 @@
 (require 'json)
 (require 'subr-x)
 (require 'esh-util)
+(require 'shell)
 
 ;; TODO: move common stuff to function in nix-buffer.el
 
 (defvar-local nix-buffer-env (json-read-file "@env@"))
+(defvar-local nix-buffer-stdenv "@stdenv@")
+
+;; (put 'explicit-bash-args 'permanent-local t)
+;; (make-local-variable 'explicit-bash-args)
+;; (setq-local explicit-bash-args `("-c" ,(concat
+;;					"exec "
+;;					nix-buffer-stdenv
+;;					"/setup")))
 
 ;; setenv modifies in place, so copy the environment first
 (put 'process-environment 'permanent-local t)
+;; (make-local-variable 'process-environment)
 (setq-local process-environment (copy-tree process-environment))
 
 (dolist (x nix-buffer-env)
@@ -17,11 +27,17 @@
 ;; don’t override parent PATH
 (setenv "PATH" (concat (alist-get 'PATH nix-buffer-env) ":" (getenv "PATH")))
 
+;; (make-directory (alist-get 'NIX_BUILD_TOP nix-buffer-env))
+
 (put 'exec-path 'permanent-local t)
-(setq-local exec-path (split-string (getenv "PATH") ":"))
+;; (make-local-variable 'exec-path)
+(setq-local exec-path (parse-colon-path (getenv "PATH")))
 
 (put 'eshell-path-env 'permanent-local t)
+;; (make-local-variable 'eshell-path-env)
 (setq-local eshell-path-env (getenv "PATH"))
+
+;; (add-hook 'eshell-mode-hook 'nix-buffer-dir-local)
 
 ;; Local Variables:
 ;; flycheck-disabled-checkers: (emacs-lisp-checkdoc)

@@ -19,6 +19,7 @@ let
   });
   withPackage = pkg: runCommand "dir-locals.el" {
     env = packageEnv pkg;
+    inherit (pkgs) stdenv;
   } ''
     cp ${./dir-locals.el.in} $out
     substituteAllInPlace $out
