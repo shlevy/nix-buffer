@@ -1,3 +1,5 @@
+;; -*- mode: emacs-lisp -*-
+
 (require 'json)
 (require 'subr-x)
 (require 'esh-util)

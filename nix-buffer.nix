@@ -3,7 +3,6 @@ let
   pkgs = import <nixpkgs> {};
   inherit (pkgs) writeText runCommand;
   inherit (pkgs.lib) overrideDerivation isDerivation;
-  inherit (pkgs.emacsPackagesNg) inherit-local;
   inherit (pkgs.nixBufferBuilders) withPackages;
 
   defnix = root + "/default.nix";
