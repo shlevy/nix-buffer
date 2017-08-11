@@ -6,7 +6,7 @@ let
   inherit (pkgs.emacsPackagesNg) inherit-local;
   inherit (pkgs.nixBufferBuilders) withPackages;
 
-  defnix = builtins.toPath (root + "/default.nix");
+  defnix = root + "/default.nix";
   drv' = import defnix;
   drv = if (builtins.isFunction (import defnix)) then import defnix {}
         else import defnix;

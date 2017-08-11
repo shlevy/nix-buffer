@@ -231,8 +231,9 @@ is removed."
          (defnix (if (file-exists-p dir-locals) dir-locals
                    (expand-file-name "nix-buffer.nix"
                                      (file-name-directory
-                                      (locate-library "nix-buffer"))))))
-    (nix-buffer--nix-build root defnix)))
+                                      (locate-library "nix-buffer")))))
+	 (root_ (substring root 0 -1))) ;; cut off trailing slash
+    (nix-buffer--nix-build root_ defnix)))
 
 ;;;###autoload
 (defun nix-buffer-projectile ()
