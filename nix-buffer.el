@@ -28,7 +28,7 @@
   :package-version '('nix-buffer . "3.1.0"))
 
 (defun nix-buffer--directory-name-setter (opt val)
-  "Defcustom setter for nix-buffer-directory-name.
+  "Defcustom setter for ‘nix-buffer-directory-name’.
 OPT The option we're setting.
 
 VAL The value it's being set to."
@@ -36,7 +36,7 @@ VAL The value it's being set to."
 
 (defcustom nix-buffer-directory-name
   (locate-user-emacs-file "nix-buffer")
-  "Path where nix-buffer keeps its data.
+  "Path where ‘nix-buffer’ keeps its data.
 To update this variable outside of Customize, please use
 'nix-buffer-update-directory-name'."
   :group 'nix-buffer
@@ -49,7 +49,7 @@ To update this variable outside of Customize, please use
   (f-join nix-buffer-directory-name "trusted-exprs"))
 
 (defun nix-buffer--load-trusted-exprs ()
-  "Load the trusted nix-buffer exprs."
+  "Load the trusted ‘nix-buffer’ exprs."
   (let ((tbl (ignore-errors
 	       (with-temp-buffer
 		 (insert-file-contents-literally
@@ -62,8 +62,8 @@ To update this variable outside of Customize, please use
 (defvar nix-buffer--trusted-exprs (nix-buffer--load-trusted-exprs))
 
 (defun nix-buffer-update-directory-name (path)
-  "Update the nix-buffer state directory.
-PATH The path to store the nix-buffer state."
+  "Update the ‘nix-buffer’ state directory.
+PATH The path to store the ‘nix-buffer’ state."
   (setq nix-buffer-directory-name path)
   (setq nix-buffer--trust-exprs-file
 	(f-join nix-buffer-directory-name "trusted-exprs"))
@@ -100,10 +100,10 @@ LISP-FILE The file in question."
     res))
 
 (defvar nix-buffer-after-load-hook nil
-  "Hook run after nix-buffer loads an expression.")
+  "Hook run after ‘nix-buffer’ loads an expression.")
 
 (defun nix-buffer--load-result (expr-file out)
-  "Load the result of a nix-buffer build, checking for safety.
+  "Load the result of a ‘nix-buffer’ build, checking for safety.
 EXPR-FILE The nix expression being built.
 
 OUT The build result."
