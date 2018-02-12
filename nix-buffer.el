@@ -109,7 +109,7 @@ EXPR-FILE The nix expression being built.
 OUT The build result."
   (when (or (gethash out nix-buffer--trusted-exprs)
 	    (nix-buffer--query-safety expr-file out))
-    (load-file out)
+    (load out t t nil t)
     (run-hooks 'nix-buffer-after-load-hook)))
 
 (defun nix-buffer--sentinel
@@ -148,8 +148,9 @@ EVENT The process status change event string."
 		    " with error output: \n")
 	    (insert-buffer-substring err-buf)
 	    (pop-to-buffer (current-buffer))))
-	(kill-buffer out-buf)
-	(kill-buffer err-buf)))))
+	(let ((kill-buffer-query-functions nil))
+	  (kill-buffer out-buf)
+	  (kill-buffer err-buf))))))
 
 (defun nix-buffer--nix-build (root expr-file)
   "Start the nix build.
