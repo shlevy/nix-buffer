@@ -230,3 +230,7 @@ is removed."
 (provide 'nix-buffer)
 
 ;;; nix-buffer.el ends here
+
+;; Local Variables:
+;; tab-width: 8
+;; End:
