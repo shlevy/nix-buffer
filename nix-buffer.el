@@ -219,7 +219,8 @@ If dir-locals.nix does not evaluate to any derivations (e.g. it
 evaluates to {}), then nothing is loaded and the cached result, if any,
 is removed."
   (interactive)
-  (let* ((root (directory-file-name (or (buffer-file-name) default-directory)))
+  (let* ((root (f-expand (directory-file-name
+			  (or (buffer-file-name) default-directory))))
 	 (expr-dir (locate-dominating-file root nix-buffer-root-file)))
     (when expr-dir
       (let ((expr-file (f-expand nix-buffer-root-file expr-dir)))
