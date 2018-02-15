@@ -106,7 +106,9 @@ LISP-FILE The file in question."
   "Load the result of a ‘nix-buffer’ build, checking for safety.
 EXPR-FILE The nix expression being built.
 
-OUT The build result."
+OUT The build result.
+
+SKIP-SAFETY whether to skip safety checks."
   (when (or skip-safety
 	    (gethash out nix-buffer--trusted-exprs)
 	    (nix-buffer--query-safety expr-file out))
@@ -157,9 +159,11 @@ EVENT The process status change event string."
 
 (defun nix-buffer--nix-build (expr-file &optional root skip-safety)
   "Start the nix build.
+EXPR-FILE The file containing the nix expression to build.
+
 ROOT The path we started from.
 
-EXPR-FILE The file containing the nix expression to build."
+SKIP-SAFETY whether to skip the safety checks."
   (let* ((state-dir (f-join nix-buffer-directory-name
 			    (nix-buffer--unique-filename (or root
 							     default-directory))))
@@ -195,12 +199,12 @@ EXPR-FILE The file containing the nix expression to build."
   :type '(string))
 
 ;;;###autoload
-(defun nix-buffer-with-string (string)
-  "Start ‘nix-buffer’ but with a string expression."
+(defun nix-buffer-with-string (expression)
+  "Start ‘nix-buffer’ but with a string EXPRESSION."
   (interactive)
   (let ((expr-file (make-temp-file "nix-buffer")))
     (with-temp-file expr-file
-      (insert string))
+      (insert expression))
     (nix-buffer--nix-build expr-file nil t)))
 
 ;;;###autoload
