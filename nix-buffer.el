@@ -166,7 +166,7 @@ ROOT The path we started from.
 SKIP-SAFETY whether to skip the safety checks."
   (let* ((state-dir (f-join nix-buffer-directory-name
 			    (nix-buffer--unique-filename (or root
-							     default-directory))))
+							     buffer-file-name))))
 	 (out-link (f-join state-dir "result"))
 	 (current-out (file-symlink-p out-link))
 	 (err (generate-new-buffer " nix-buffer-nix-build-stderr"))
