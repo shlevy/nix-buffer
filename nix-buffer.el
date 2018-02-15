@@ -153,7 +153,7 @@ EVENT The process status change event string."
 	  (kill-buffer out-buf)
 	  (kill-buffer err-buf))))))
 
-(defun nix-buffer--nix-build (root expr-file)
+(defun nix-buffer--nix-build (expr-file &optional root)
   "Start the nix build.
 ROOT The path we started from.
 
@@ -162,17 +162,18 @@ EXPR-FILE The file containing the nix expression to build."
 			    (nix-buffer--unique-filename root)))
 	 (out-link (f-join state-dir "result"))
 	 (current-out (file-symlink-p out-link))
-	 (err (generate-new-buffer " nix-buffer-nix-build-stderr")))
+	 (err (generate-new-buffer " nix-buffer-nix-build-stderr"))
+	 (command (list "nix-build" expr-file
+			"--out-link" out-link)))
     (ignore-errors (make-directory state-dir t))
+    (when root
+      (push "--arg" 'command)
+      (push "root" 'command)
+      (push root 'command))
     (make-process
      :name "nix-buffer-nix-build"
      :buffer (generate-new-buffer " nix-buffer-nix-build-stdout")
-     :command (list
-	       "nix-build"
-	       "--arg" "root" root
-	       "--out-link" out-link
-	       expr-file
-	       )
+     :command command
      :noquery t
      :sentinel (apply-partially 'nix-buffer--sentinel
 				out-link
@@ -225,7 +226,7 @@ is removed."
 	 (expr-dir (locate-dominating-file root nix-buffer-root-file)))
     (when expr-dir
       (let ((expr-file (f-expand nix-buffer-root-file expr-dir)))
-	(nix-buffer--nix-build root expr-file)))))
+	(nix-buffer--nix-build expr-file root)))))
 
 (add-hook 'kill-emacs-hook 'nix-buffer-unload-function)
 
