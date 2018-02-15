@@ -102,12 +102,13 @@ LISP-FILE The file in question."
 (defvar nix-buffer-after-load-hook nil
   "Hook run after ‘nix-buffer’ loads an expression.")
 
-(defun nix-buffer--load-result (expr-file out)
+(defun nix-buffer--load-result (expr-file out &optional skip-safety)
   "Load the result of a ‘nix-buffer’ build, checking for safety.
 EXPR-FILE The nix expression being built.
 
 OUT The build result."
-  (when (or (gethash out nix-buffer--trusted-exprs)
+  (when (or skip-safety
+	    (gethash out nix-buffer--trusted-exprs)
 	    (nix-buffer--query-safety expr-file out))
     (load out t t nil t)
     (run-hooks 'nix-buffer-after-load-hook)))
@@ -138,7 +139,7 @@ EVENT The process status change event string."
 		  (ignore-errors (delete-file out-link))
 		(unless (string= last-out cur-out)
 		  (with-current-buffer user-buf
-		    (nix-buffer--load-result expr-file cur-out)))))
+		    (nix-buffer--load-result expr-file cur-out nil)))))
 	  (with-current-buffer
 	      (get-buffer-create "*nix-buffer errors*")
 	    (insert "nix-build for nix-buffer for "
@@ -181,7 +182,7 @@ EXPR-FILE The file containing the nix expression to build."
 				err)
      :stderr err)
     (when current-out
-      (nix-buffer--load-result expr-file current-out))))
+      (nix-buffer--load-result expr-file current-out nil))))
 
 (defcustom nix-buffer-root-file "dir-locals.nix"
   "File name to use for determining Nix expression to use."
