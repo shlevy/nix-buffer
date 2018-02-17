@@ -102,18 +102,21 @@ LISP-FILE The file in question."
 (defvar nix-buffer-after-load-hook nil
   "Hook run after ‘nix-buffer’ loads an expression.")
 
-(defun nix-buffer--load-result (expr-file out)
+(defun nix-buffer--load-result (expr-file out &optional skip-safety)
   "Load the result of a ‘nix-buffer’ build, checking for safety.
 EXPR-FILE The nix expression being built.
 
-OUT The build result."
-  (when (or (gethash out nix-buffer--trusted-exprs)
+OUT The build result.
+
+SKIP-SAFETY whether to skip safety checks."
+  (when (or skip-safety
+	    (gethash out nix-buffer--trusted-exprs)
 	    (nix-buffer--query-safety expr-file out))
     (load out t t nil t)
     (run-hooks 'nix-buffer-after-load-hook)))
 
 (defun nix-buffer--sentinel
-    (out-link last-out expr-file user-buf err-buf process event)
+    (out-link last-out expr-file user-buf err-buf skip-safety process event)
   "Handle the results of the nix build.
 OUT-LINK The path to the output symlink.
 
@@ -124,6 +127,8 @@ EXPR-FILE The nix expression being built.
 USER-BUF The buffer to apply the results to.
 
 ERR-BUF The standard error buffer of the nix-build
+
+SKIP-SAFETY Skip safety checks.
 
 PROCESS The process whose status changed.
 
@@ -138,7 +143,7 @@ EVENT The process status change event string."
 		  (ignore-errors (delete-file out-link))
 		(unless (string= last-out cur-out)
 		  (with-current-buffer user-buf
-		    (nix-buffer--load-result expr-file cur-out)))))
+		    (nix-buffer--load-result expr-file cur-out skip-safety)))))
 	  (with-current-buffer
 	      (get-buffer-create "*nix-buffer errors*")
 	    (insert "nix-build for nix-buffer for "
@@ -154,9 +159,9 @@ EVENT The process status change event string."
 
 (defun nix-buffer--nix-build (root expr-file)
   "Start the nix build.
-ROOT The path we started from.
+EXPR-FILE The file containing the nix expression to build.
 
-EXPR-FILE The file containing the nix expression to build."
+ROOT The path we started from."
   (let* ((state-dir (f-join nix-buffer-directory-name
 			    (nix-buffer--unique-filename root)))
 	 (out-link (f-join state-dir "result"))
@@ -178,15 +183,46 @@ EXPR-FILE The file containing the nix expression to build."
 				current-out
 				expr-file
 				(current-buffer)
-				err)
+				err
+				nil)
      :stderr err)
     (when current-out
-      (nix-buffer--load-result expr-file current-out))))
+      (nix-buffer--load-result expr-file current-out nil))))
 
 (defcustom nix-buffer-root-file "dir-locals.nix"
   "File name to use for determining Nix expression to use."
   :group 'nix-buffer
   :type '(string))
+
+;;;###autoload
+(defun nix-buffer-with-string (expression)
+  "Start ‘nix-buffer’ but with a string EXPRESSION."
+  (interactive "sNix expression: ")
+  (let* ((state-dir (f-join nix-buffer-directory-name
+			    (secure-hash 'sha256 expression)))
+	 (out-link (f-join state-dir "result"))
+	 (current-out (file-symlink-p out-link))
+	 (err (generate-new-buffer " nix-buffer-nix-build-stderr")))
+    (ignore-errors (make-directory state-dir t))
+    (make-process
+     :name "nix-buffer-nix-build"
+     :buffer (generate-new-buffer " nix-buffer-nix-build-stdout")
+     :command (list
+	       "nix-build"
+	       "--out-link" out-link
+	       "-E" expression
+	       )
+     :noquery t
+     :sentinel (apply-partially 'nix-buffer--sentinel
+				out-link
+				current-out
+				nil
+				(current-buffer)
+				err
+				t)
+     :stderr err)
+    (when current-out
+      (nix-buffer--load-result nil current-out t))))
 
 ;;;###autoload
 (defun nix-buffer ()
