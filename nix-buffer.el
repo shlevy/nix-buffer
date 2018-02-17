@@ -201,7 +201,7 @@ SKIP-SAFETY whether to skip the safety checks."
 ;;;###autoload
 (defun nix-buffer-with-string (expression)
   "Start ‘nix-buffer’ but with a string EXPRESSION."
-  (interactive)
+  (interactive "sNix expression: ")
   (let ((expr-file (make-temp-file "nix-buffer")))
     (with-temp-file expr-file
       (insert expression))
