@@ -157,30 +157,26 @@ EVENT The process status change event string."
 	  (kill-buffer out-buf)
 	  (kill-buffer err-buf))))))
 
-(defun nix-buffer--nix-build (expr-file &optional root skip-safety)
+(defun nix-buffer--nix-build (root expr-file)
   "Start the nix build.
 EXPR-FILE The file containing the nix expression to build.
 
-ROOT The path we started from.
-
-SKIP-SAFETY whether to skip the safety checks."
+ROOT The path we started from."
   (let* ((state-dir (f-join nix-buffer-directory-name
-			    (nix-buffer--unique-filename (or root
-							     buffer-file-name))))
+			    (nix-buffer--unique-filename root)))
 	 (out-link (f-join state-dir "result"))
 	 (current-out (file-symlink-p out-link))
-	 (err (generate-new-buffer " nix-buffer-nix-build-stderr"))
-	 (command (list "nix-build" expr-file
-			"--out-link" out-link)))
+	 (err (generate-new-buffer " nix-buffer-nix-build-stderr")))
     (ignore-errors (make-directory state-dir t))
-    (when root
-      (push "--arg" 'command)
-      (push "root" 'command)
-      (push root 'command))
     (make-process
      :name "nix-buffer-nix-build"
      :buffer (generate-new-buffer " nix-buffer-nix-build-stdout")
-     :command command
+     :command (list
+	       "nix-build"
+	       "--arg" "root" root
+	       "--out-link" out-link
+	       expr-file
+	       )
      :noquery t
      :sentinel (apply-partially 'nix-buffer--sentinel
 				out-link
@@ -188,10 +184,10 @@ SKIP-SAFETY whether to skip the safety checks."
 				expr-file
 				(current-buffer)
 				err
-				skip-safety)
+				nil)
      :stderr err)
     (when current-out
-      (nix-buffer--load-result expr-file current-out skip-safety))))
+      (nix-buffer--load-result expr-file current-out nil))))
 
 (defcustom nix-buffer-root-file "dir-locals.nix"
   "File name to use for determining Nix expression to use."
@@ -202,10 +198,31 @@ SKIP-SAFETY whether to skip the safety checks."
 (defun nix-buffer-with-string (expression)
   "Start ‘nix-buffer’ but with a string EXPRESSION."
   (interactive "sNix expression: ")
-  (let ((expr-file (make-temp-file "nix-buffer")))
-    (with-temp-file expr-file
-      (insert expression))
-    (nix-buffer--nix-build expr-file nil t)))
+  (let* ((state-dir (f-join nix-buffer-directory-name
+			    (secure-hash 'sha256 expression)))
+	 (out-link (f-join state-dir "result"))
+	 (current-out (file-symlink-p out-link))
+	 (err (generate-new-buffer " nix-buffer-nix-build-stderr")))
+    (ignore-errors (make-directory state-dir t))
+    (make-process
+     :name "nix-buffer-nix-build"
+     :buffer (generate-new-buffer " nix-buffer-nix-build-stdout")
+     :command (list
+	       "nix-build"
+	       "--out-link" out-link
+	       "-E" expression
+	       )
+     :noquery t
+     :sentinel (apply-partially 'nix-buffer--sentinel
+				out-link
+				current-out
+				nil
+				(current-buffer)
+				err
+				t)
+     :stderr err)
+    (when current-out
+      (nix-buffer--load-result nil current-out t))))
 
 ;;;###autoload
 (defun nix-buffer ()
@@ -243,7 +260,7 @@ is removed."
 	 (expr-dir (locate-dominating-file root nix-buffer-root-file)))
     (when expr-dir
       (let ((expr-file (f-expand nix-buffer-root-file expr-dir)))
-	(nix-buffer--nix-build expr-file root nil)))))
+	(nix-buffer--nix-build root expr-file)))))
 
 (add-hook 'kill-emacs-hook 'nix-buffer-unload-function)
 
